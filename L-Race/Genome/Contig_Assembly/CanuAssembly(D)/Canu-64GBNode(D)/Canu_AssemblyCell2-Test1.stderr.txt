@@ -1,0 +1,115 @@
+-- Canu 2.0
+--
+-- Detected Java(TM) Runtime Environment '1.8.0_181' (from '/sw/eb/software/JDK/1.8.0_181/bin/java') with -d64 support.
+-- Detected gnuplot version '5.0 patchlevel 6   ' (from 'gnuplot') and image format 'png'.
+-- Detected 20 CPUs and 63 gigabytes of memory.
+-- Detected LSF with 'bsub' binary in /software/lsf/9.1/linux2.6-glibc2.3-x86_64/bin/bsub.
+-- Grid engine and staging disabled per useGrid=false option.
+--
+--                                (tag)Concurrency
+--                         (tag)Threads          |
+--                (tag)Memory         |          |
+--        (tag)             |         |          |       total usage      algorithm
+--        -------  ----------  --------   --------  --------------------  -----------------------------
+-- Local: meryl     15.000 GB    5 CPUs x   4 jobs    60.000 GB  20 CPUs  (k-mer counting)
+-- Local: hap       12.000 GB   20 CPUs x   1 job     12.000 GB  20 CPUs  (read-to-haplotype assignment)
+-- Local: cormhap   13.000 GB   10 CPUs x   2 jobs    26.000 GB  20 CPUs  (overlap detection with mhap)
+-- Local: obtovl     8.000 GB    5 CPUs x   4 jobs    32.000 GB  20 CPUs  (overlap detection)
+-- Local: utgovl     8.000 GB    5 CPUs x   4 jobs    32.000 GB  20 CPUs  (overlap detection)
+-- Local: cor       16.000 GB    4 CPUs x   3 jobs    48.000 GB  12 CPUs  (read correction)
+-- Local: ovb        4.000 GB    1 CPU  x  15 jobs    60.000 GB  15 CPUs  (overlap store bucketizer)
+-- Local: ovs        8.000 GB    1 CPU  x   7 jobs    56.000 GB   7 CPUs  (overlap store sorting)
+-- Local: red       15.000 GB    5 CPUs x   4 jobs    60.000 GB  20 CPUs  (read error detection)
+-- Local: oea        8.000 GB    1 CPU  x   7 jobs    56.000 GB   7 CPUs  (overlap error adjustment)
+-- Local: bat       63.000 GB    8 CPUs x   1 job     63.000 GB   8 CPUs  (contig construction with bogart)
+-- Local: cns        -.--- GB    8 CPUs x   - jobs     -.--- GB   - CPUs  (consensus)
+-- Local: gfa       16.000 GB    8 CPUs x   1 job     16.000 GB   8 CPUs  (GFA alignment and processing)
+--
+-- Found untrimmed raw Nanopore reads in the input files.
+--
+-- Generating assembly 'LraceTest1' in '/scratch/user/devonjboland/CSH_ONT_ABLRaces_Bbraunii/Canu-Cell2-Barcode10-Lrace':
+--    - correct raw reads.
+--    - trim corrected reads.
+--    - assemble corrected and trimmed reads.
+--
+-- Parameters:
+--
+--  genomeSize        211300000
+--
+--  Overlap Generation Limits:
+--    corOvlErrorRate 0.5000 ( 50.00%)
+--    obtOvlErrorRate 0.1440 ( 14.40%)
+--    utgOvlErrorRate 0.1440 ( 14.40%)
+--
+--  Overlap Processing Limits:
+--    corErrorRate    0.5000 ( 50.00%)
+--    obtErrorRate    0.1440 ( 14.40%)
+--    utgErrorRate    0.1440 ( 14.40%)
+--    cnsErrorRate    0.1440 ( 14.40%)
+--
+--
+-- BEGIN CORRECTION
+--
+----------------------------------------
+-- Starting command on Fri Jan 15 15:45:40 2021 with 179147.515 GB free disk space
+
+    cd .
+    ./LraceTest1.seqStore.sh \
+    > ./LraceTest1.seqStore.err 2>&1
+
+-- Finished on Fri Jan 15 15:46:07 2021 (27 seconds) with 179164.234 GB free disk space
+----------------------------------------
+
+ERROR:
+ERROR:  Failed with exit code 1.  (rc=256)
+ERROR:
+
+ABORT:
+ABORT: Canu 2.0
+ABORT: Don't panic, but a mostly harmless error occurred and Canu stopped.
+ABORT: Try restarting.  If that doesn't work, ask for help.
+ABORT:
+ABORT:   sqStoreCreate failed; boom!.
+ABORT:
+ABORT: Disk space available:  179164.234 GB
+ABORT:
+ABORT: Last 50 lines of the relevant log file (./LraceTest1.seqStore.err):
+ABORT:
+ABORT:   
+ABORT:   Found perl:
+ABORT:      /software/easybuild/software/Perl/5.24.0-GCCcore-6.3.0/bin/perl
+ABORT:      This is perl 5, version 24, subversion 0 (v5.24.0) built for x86_64-linux-thread-multi
+ABORT:   
+ABORT:   Found java:
+ABORT:      /sw/eb/software/JDK/1.8.0_181/bin/java
+ABORT:      java version "1.8.0_181"
+ABORT:   
+ABORT:   Found canu:
+ABORT:      /general/software/x86_64/easybuild/software/Canu/2.0-intel-2017A-Perl-5.24.0/Linux-amd64/bin/canu
+ABORT:      Canu 2.0
+ABORT:   
+ABORT:   
+ABORT:   Creating library 'cell2_barcode10trimmed' for Nanopore raw reads.
+ABORT:   
+ABORT:                  reads               bases
+ABORT:   ---------- --------- ------ ------------ ------
+ABORT:   
+ABORT:   gzip: /scratch/user/devonjboland/CSH_ONT_ABLRaces_Bbraunii/cell2trimmed/barcode10/cell2_barcode10trimmed.fastq.gz: unexpected end of file
+ABORT:   sqStoreCreate: utility/sequence.C:721: unsigned long dnaSeqFile::loadFASTQ(char *&, unsigned int &, char *&, unsigned char *&, unsigned long &): Assertion `seqLen == qltLen' failed.
+ABORT:   
+ABORT:   Failed with 'Aborted'; backtrace (libbacktrace):
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   (null)::0 in (null)()
+ABORT:   ./LraceTest1.seqStore.sh: line 54: 19055 Aborted                 (core dumped) /general/software/x86_64/easybuild/software/Canu/2.0-intel-2017A-Perl-5.24.0/Linux-amd64/bin/sqStoreCreate -o ./LraceTest1.seqStore.BUILDING -minlength 1000 -genomesize 211300000 -coverage 200 -bias 0 -raw -nanopore cell2_barcode10trimmed /scratch/user/devonjboland/CSH_ONT_ABLRaces_Bbraunii/cell2trimmed/barcode10/cell2_barcode10trimmed.fastq.gz
+ABORT:

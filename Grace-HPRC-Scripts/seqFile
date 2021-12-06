@@ -1,0 +1,8 @@
+# This tree file was edited to remove internode labels any numbers between ) : were removed, as this was casusing an issue with cactus. See https://github.com/ComparativeGenomicsToolkit/cactus/issues/355
+(Astpho2,(TrebA12,((Coccomyxa_C169,(BobraA,(BobraL,Botrbrau1)2.098417922365678):2.2144989947705627):0.5000152989994587,((Dunsal1,(Volca2,(Chlsc1,(Chlin1,Chlre5_6):0.5216363792205702):2.910476545352208):3.31377580435229):2.3856459502393252,((Picsp_1,Picre1):3.13019890122447,(Auxeprot1,(Chloso1602,(Chlorella_NC64A,Micco1):0.08177983117418851):2.729357586254338):0.07103545484903179):1.375826870303066):0.8410535260113118):1.6400813197049036):0.0);
+
+*Chlre5_6 /scratch/user/devonjboland/Cactus/Chlre5_6_AssemblyScaffolds_Repeatmasked.fasta
+Coccomyxa_C169 /scratch/user/devonjboland/Cactus/Coccomyxa_C169_v2_masked_genomic_scaffolds.fasta
+BobraA /scratch/user/devonjboland/Cactus/Arace-Nuclear-Genome-v1-soft_masked.fasta
+Botrbrau1 /scratch/user/devonjboland/Cactus/Botrbrau1_AssemblyScaffolds_Repeatmasked.fasta
+BobraL /scratch/user/devonjboland/Cactus/Lrace-Nuclear-Genome-v1-soft_masked.fasta

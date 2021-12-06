@@ -1,0 +1,19 @@
+cat Arace.txt | while read line
+do
+echo blastp -query /scratch/user/devonjboland/GO-Annotation/Arace/Arace-Proteins/${line} -db ${nr} -outfmt 14  -max_target_seqs 20 -num_threads 5 -out /scratch/user/devonjboland/GO-Annotation/Arace/${line}.xml >> commands.txt 
+done
+
+cat Lrace.txt | while read line
+do
+echo blastp -query /scratch/user/devonjboland/GO-Annotation/Lrace/Lrace-Proteins/${line} -db ${nr} -outfmt 14 -max_target_seqs 20 -num_threads 5 -out /scratch/user/devonjboland/GO-Annotation/Lrace/${line}.xml
+done
+
+cat Arace.txt | while read line
+do
+echo java -Xmx2900G -jar \$EBROOTINTERPROSCAN/interproscan-5.jar -cpu 5 -f XML  -goterms -i /scratch/user/devonjboland/GO-Annotation/Arace/Arace-Proteins/${line} -iprlookup -o /scratch/user/devonjboland/GO-Annotation/Arace/${line}-interpro.xml -pa -T /scratch/user/devonjboland/GO-Annotation/ >> interpro-commands.txt
+done
+
+cat Lrace.txt | while read line
+do
+echo java -Xmx2900G -jar \$EBROOTINTERPROSCAN/interproscan-5.jar -cpu 5 -f XML  -goterms -i /scratch/user/devonjboland/GO-Annotation/Lrace/Lrace-Proteins/${line} -iprlookup -o /scratch/user/devonjboland/GO-Annotation/Lrace/${line}-interpro.xml -pa -T /scratch/user/devonjboland/GO-Annotation/ >> interpro-commands.txt
+done
