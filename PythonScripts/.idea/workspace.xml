@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3d99782a-eeeb-4a54-ab93-fcc9036d9005" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Gene-Feature/UTR-GTFs/test.gtf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gene-Feature/test-complete.gtf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gene-Feature/test-incomplete.gtf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Gene-Feature/Gene-Feature-Format.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gene-Feature/Gene-Feature-Format.py" afterDir="false" />
     </list>
@@ -15,6 +12,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="21v9pW5LZHUwNu0yNGNPLtd0SW6" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -42,6 +42,9 @@
       <option name="presentableId" value="Default" />
       <updated>1638810877101</updated>
       <workItem from="1638810879345" duration="7171000" />
+      <workItem from="1638896181274" duration="639000" />
+      <workItem from="1638898611619" duration="6089000" />
+      <workItem from="1638993650831" duration="337000" />
     </task>
     <servers />
   </component>
