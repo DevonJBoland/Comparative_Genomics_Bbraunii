@@ -1,0 +1,6 @@
+seqname	source	feature	start	end	score	strand	frame	attribute
+contig_103_pilon_pilon	GUSHR	transcript	33646	34273	.	-	.	g17829.t1
+contig_103_pilon_pilon	AUGUSTUS	stop_codon	33646	33648	.	-	0	"transcript_id ""g17829.t1""; gene_id ""g17829"";"
+contig_103_pilon_pilon	AUGUSTUS	CDS	33646	33770	0.65	-	2	"transcript_id ""g17829.t1""; gene_id ""g17829"";"
+contig_103_pilon_pilon	AUGUSTUS	CDS	34186	34273	0.98	-	0	"transcript_id ""g17829.t1""; gene_id ""g17829"";"
+contig_103_pilon_pilon	AUGUSTUS	start_codon	34271	34273	.	-	0	"transcript_id ""g17829.t1""; gene_id ""g17829"";"
