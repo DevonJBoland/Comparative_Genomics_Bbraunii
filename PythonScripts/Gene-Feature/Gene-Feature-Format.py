@@ -2,15 +2,21 @@
 
 import pandas as pd
 import re
-from toolz import interleave
-#import concurrent.futures as cf
+import argparse as ap
 
-# Function to format GTF data by feature
-# Need to add a filtering step where genes are removed if they do not contain all features
+parser = ap.ArgumentParser(description="Script to filter GTF files off incomplete gene annotations, "
+                                       "and annotate intronic regions")
+parser.add_argument("input", type=str, help="gtf file to extract feature from")
+parser.add_argument("filtered_out", type=str, help="Path to write filtered complete models to")
+parser.add_argument("incomplet_out", type=str, help="Path to write filtered incomplete models to")
+parser.add_argument("intron_annotated_out", type=str, help="Path to write filtered intron annotated "
+                                                              "complete models to")
+args = parser.parse_args()
+
+col_names = ['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
 
 
 def filter_genes(x):
-    col_names = ['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
     data = pd.read_csv(x, index_col=False, header=None, delimiter="\t", names=col_names)
     # Prefiltering Step
     incomplete_genes_df = pd.DataFrame(columns=col_names)
@@ -38,18 +44,16 @@ def filter_genes(x):
             data = data.iloc[1:, :]
         data = data.reset_index(drop=True)
 
-    # complete_genes_df.to_csv("test-complete-filtered.gtf", sep="\t", header=True, index=False)
-    # incomplete_genes_df.to_csv("test-incomplete-filtered.gtf", sep="\t", header=True, index=False)
+    complete_genes_df.to_csv(args.filtered_out, sep="\t", header=True, index=False)
+    incomplete_genes_df.to_csv(args.incomplete_out, sep="\t", header=True, index=False)
 
     return complete_genes_df
 
 
 def get_intron(gene_df):  # Not working properly to create a list of transcript IDs
-    col_names = ['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
     transcript_ID = [gene_df.at[n, 'attribute'] for n in gene_df.index if gene_df.at[n, 'feature'] == 'transcript']
-    # if not transcript_ID:
-    #     print("transcript list is empty")
-    #     return
+    transcript_with_introns_temp = pd.DataFrame(columns=col_names)
+    transcript_with_introns = pd.DataFrame(columns=col_names)
     for transcript in transcript_ID:
         temp_gene_df = pd.DataFrame(columns=col_names)
         for y in range(0, len(gene_df.index)):
@@ -60,82 +64,88 @@ def get_intron(gene_df):  # Not working properly to create a list of transcript 
             temp_df = reversechunck(temp_gene_df)
         else:
             temp_df = temp_gene_df
-        fiveprime_array = temp_gene_df[temp_gene_df.feature == '5\'-UTR']
-        cds_array = temp_gene_df[temp_gene_df.feature == 'CDS']
-        threeprime_array = temp_gene_df[temp_gene_df.feature == '3\'-UTR']
-        seqname = temp_df.at[1, 'seqname']
-        source = 'Custom_Intron_Script'
-        feature = 'intron'
-        score = '.'
-        strand = temp_df.at[1, 'strand']
-        frame = '.'
-        attribute = temp_df.at[1, 'strand']
-        temp_intron_df = pd.DataFrame(columns=col_names)
-        if len(fiveprime_array) > 1:
-            for n in fiveprime_array.index:
-                intron_start = int(fiveprime_array.at[n, 'end']+1)
-                intron_end = int(fiveprime_array.at[n+1, 'start']-1)
-                intron_annotations = [seqname, source, feature, intron_start, intron_end, score, strand, frame,
-                                      attribute]
-                entry = dict(zip(col_names, intron_annotations))
-                temp_intron_df = temp_intron_df.append(entry, ignore_index=True)
+
+        # Assign individual arrays for each feature, reset index for concat later
+        transcript_array = temp_df[temp_df.feature == 'transcript']
+        transcript_array.reset_index(inplace=True, drop=True)
+        fiveprime_array = temp_df[temp_df.feature == '5\'-UTR']
+        fiveprime_array.reset_index(inplace=True, drop=True)
+        startcodon_array = temp_df[temp_df.feature == 'start_codon']
+        startcodon_array.reset_index(inplace=True, drop=True)
+        cds_array = temp_df[temp_df.feature == 'CDS']
+        cds_array.reset_index(inplace=True, drop=True)
+        stopcodon_array = temp_df[temp_df.feature == 'stop_codon']
+        stopcodon_array.reset_index(inplace=True, drop=True)
+        threeprime_array = temp_df[temp_df.feature == '3\'-UTR']
+        threeprime_array.reset_index(inplace=True, drop=True)
+
+        fiveprime_intron_array = annotate_intron(fiveprime_array)
+        cds_intron_array = annotate_intron(cds_array)
+        threeprime_intron_array = annotate_intron(threeprime_array)
+        transcript_with_introns_temp = pd.concat([transcript_array, fiveprime_intron_array, startcodon_array,
+                                             cds_intron_array, stopcodon_array, threeprime_intron_array],
+                                            ignore_index=True)
+        transcript_with_introns = transcript_with_introns.append(transcript_with_introns_temp, ignore_index=True)
+    transcript_with_introns.to_csv(args.intron_annotated_out, sep="\t", header=True, index=False)
+    return transcript_with_introns
 
 
+def annotate_intron(feature_array):
+    intron_feature_array = pd.DataFrame(columns=col_names)
+    seqname = feature_array.at[0, 'seqname']
+    source = 'Custom_Intron_Script'
+    feature = 'intron'
+    score = '.'
+    strand = feature_array.at[0, 'strand']
+    frame = '.'
+    attribute = feature_array.at[0, 'attribute']
+    limit = (len(feature_array) - 1)
+    if limit == 0:
+        intron_feature_array = feature_array
+    else:
+        for n in range(0, (limit-1), 1):
+            feature_entry = feature_array.loc[n]
+            intron_start = int(feature_array.at[n, 'end'] + 1)
+            intron_end = int(feature_array.at[n + 1, 'start'] - 1)
+            intron_annotations = [seqname, source, feature, intron_start, intron_end, score, strand, frame,
+                                  attribute]
+            intron_entry = dict(zip(col_names, intron_annotations))
+            intron_feature_array = intron_feature_array.append(feature_entry, ignore_index=True)
+            intron_feature_array = intron_feature_array.append(intron_entry, ignore_index=True)
+        last_feature_entry = feature_array.loc[limit]
+        intron_feature_array = intron_feature_array.append(last_feature_entry, ignore_index=True)
+    return intron_feature_array
 
-
-
-        # if isnegeativegene(temp_df):
-        #     reverse_df = reversechunck(temp_df)
-        #     get_cds_intron(reverse_df)
-        # # test = temp_df
-        # if isnegeativegene(temp_df):
-        #     reverse_temp_df = reversechunck(temp_df)
-        #     if meetsgenecriteria(feature_checklist):
-        #         return 'Is Complete'
-        #     else:
-        #         return 'Not Complete'
-
-    
 
 def isnegeativegene(gene_chunck):
-    return gene_chunck.at [1, 'strand'] in ['-', '- '] # there is irradic spacing in the strand column throughout the gtf files.
+    return gene_chunck.at[1, 'strand'] in ['-', '- ']  # there is irradic spacing in the strand column
+    # throughout the gtf files.
+
 
 def reversechunck(gene_chunck):
     transcript_array = gene_chunck[gene_chunck.feature == 'transcript']
     features_array = gene_chunck[gene_chunck.feature != 'transcript']
     features_array = features_array.iloc[::-1]
     return transcript_array.append(features_array, ignore_index=True)
-    
-    
-
-
-        # if feature_checklist.count('5\'-UTR') >= 1 and feature_checklist.count('start_codon') == 1 and \
-        #         feature_checklist.count('CDS') >= 1 and feature_checklist.count('stop_codon') == 1 and \
-        #         feature_checklist.count('3\'-UTR') >= 1:
-        #     complete_genes_df = complete_genes_df.append(temp_df, ignore_index=True)
-        # else:
-        #     incomplete_genes_df = incomplete_genes_df.append(temp_df, ignore_index=True)
 
 
 def meetsgenecriteria(featurelist):
     return featurelist.count('5\'-UTR') >= 1 and featurelist.count('start_codon') == 1 and \
-            featurelist.count('CDS') >= 1 and featurelist.count('stop_codon') == 1 and \
-            featurelist.count('3\'-UTR') >= 1
-
-    #with cf.ProcessPoolExecutor() as executor:
-    #    executor.map(threaded_screen, transcript_ID)
-
-    # complete_genes_df.to_csv("test-complete-filtered.gtf", sep="\t", header=True, index=False)
-    # incomplete_genes_df.to_csv("test-incomplete-filtered.gtf", sep="\t", header=True, index=False)
+           featurelist.count('CDS') >= 1 and featurelist.count('stop_codon') == 1 and \
+           featurelist.count('3\'-UTR') >= 1
 
 
-with open("UTR-GTFs/test.gtf", "r") as file:
+with open(args.input, "r") as file:
     completegenes = filter_genes(file)
     # Test if the filtering step was a success
     if completegenes.empty:
         print("Genes Filtered = Failure!")
     else:
-        print("Genes Filtered = Success!"+"\n"+f"Output is saved to...")  # Need to insert a string for saved file
+        print("Genes Filtered = Success!" + "\n" + f"Output is saved to...")  # Need to insert a string for saved file
 
-    get_intron(completegenes)
+    annotated_genes = get_intron(completegenes)
+    if annotated_genes.empty:
+        print("Introns Annotated = Failure!")
+    else:
+        print("Introns Annotated = Success!" + "\n" + f"Output is saved to...")
 
