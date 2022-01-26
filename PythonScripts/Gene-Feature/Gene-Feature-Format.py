@@ -4,14 +4,14 @@ import pandas as pd
 import re
 import argparse as ap
 
-parser = ap.ArgumentParser(description="Script to filter GTF files off incomplete gene annotations, "
-                                       "and annotate intronic regions")
-parser.add_argument("input", type=str, help="gtf file to extract feature from")
-parser.add_argument("filtered_out", type=str, help="Path to write filtered complete models to")
-parser.add_argument("incomplet_out", type=str, help="Path to write filtered incomplete models to")
-parser.add_argument("intron_annotated_out", type=str, help="Path to write filtered intron annotated "
-                                                              "complete models to")
-args = parser.parse_args()
+# parser = ap.ArgumentParser(description="Script to filter GTF files off incomplete gene annotations, "
+#                                        "and annotate intronic regions")
+# parser.add_argument("input", type=str, help="gtf file to extract feature from")
+# parser.add_argument("filtered_out", type=str, help="Path to write filtered complete models to")
+# parser.add_argument("incomplete_out", type=str, help="Path to write filtered incomplete models to")
+# parser.add_argument("intron_annotated_out", type=str, help="Path to write filtered intron annotated "
+#                                                               "complete models to")
+# args = parser.parse_args()
 
 col_names = ['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
 
@@ -44,8 +44,8 @@ def filter_genes(x):
             data = data.iloc[1:, :]
         data = data.reset_index(drop=True)
 
-    complete_genes_df.to_csv(args.filtered_out, sep="\t", header=True, index=False)
-    incomplete_genes_df.to_csv(args.incomplete_out, sep="\t", header=True, index=False)
+    # complete_genes_df.to_csv(args.filtered_out, sep="\t", header=True, index=False)
+    # incomplete_genes_df.to_csv(args.incomplete_out, sep="\t", header=True, index=False)
 
     return complete_genes_df
 
@@ -66,6 +66,8 @@ def get_intron(gene_df):  # Not working properly to create a list of transcript 
             temp_df = temp_gene_df
 
         # Assign individual arrays for each feature, reset index for concat later
+        """This needs to be fixed to handle cases where a UTR may not be present,
+        as of now it causes an error when this occurs"""
         transcript_array = temp_df[temp_df.feature == 'transcript']
         transcript_array.reset_index(inplace=True, drop=True)
         fiveprime_array = temp_df[temp_df.feature == '5\'-UTR']
@@ -100,7 +102,7 @@ def annotate_intron(feature_array):
     frame = '.'
     attribute = feature_array.at[0, 'attribute']
     limit = (len(feature_array) - 1)
-    if limit == 0:
+    if limit in [-1, 0]:
         intron_feature_array = feature_array
     else:
         for n in range(0, (limit-1), 1):
@@ -130,12 +132,14 @@ def reversechunck(gene_chunck):
 
 
 def meetsgenecriteria(featurelist):
-    return featurelist.count('5\'-UTR') >= 1 and featurelist.count('start_codon') == 1 and \
-           featurelist.count('CDS') >= 1 and featurelist.count('stop_codon') == 1 and \
-           featurelist.count('3\'-UTR') >= 1
+    # return featurelist.count('5\'-UTR') >= 1 and featurelist.count('start_codon') == 1 and \
+    #        featurelist.count('CDS') >= 1 and featurelist.count('stop_codon') == 1 and \
+    #        featurelist.count('3\'-UTR') >= 1
+    return featurelist.count('start_codon') == 1 and featurelist.count('CDS') >= 1 and \
+           featurelist.count('stop_codon') == 1
+    # The requirement for feature check of UTR was removed as mRNA can be leaderless in all domains of life.
 
-
-with open(args.input, "r") as file:
+with open('UTR-GTFs/test.gtf', "r") as file:
     completegenes = filter_genes(file)
     # Test if the filtering step was a success
     if completegenes.empty:
