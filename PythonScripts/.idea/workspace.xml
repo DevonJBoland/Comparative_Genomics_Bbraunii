@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3d99782a-eeeb-4a54-ab93-fcc9036d9005" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Gene-Feature/Gene_Feature_Graph.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Gene-Feature/UTR-GTFs/Lrace-augustus.hints_utr.gtf-intron" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Gene-Feature/Gene-Feature-Format.py" beforeDir="false" afterPath="$PROJECT_DIR$/Gene-Feature/Gene-Feature-Format.py" afterDir="false" />
     </list>
@@ -129,7 +127,8 @@
       <workItem from="1643076262830" duration="1327000" />
       <workItem from="1643125008802" duration="9582000" />
       <workItem from="1643147325262" duration="492000" />
-      <workItem from="1643212998039" duration="7368000" />
+      <workItem from="1643212998039" duration="7487000" />
+      <workItem from="1643222778891" duration="1589000" />
     </task>
     <task id="LOCAL-00001" summary="rename screen function to format_data">
       <created>1639026495573</created>
@@ -154,6 +153,18 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Gene-Feature/Gene-Feature-Format.py</url>
+          <line>91</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Gene-Feature/Gene-Feature-Format.py</url>
+          <line>97</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -162,15 +173,9 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="PythonConfigurationType">
-        <watch expression="transcript_ID" language="Python" />
-        <watch expression="transcript_ID" language="Python" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PythonScripts$Gene_Feature_Format.coverage" NAME="Gene-Feature-Format Coverage Results" MODIFIED="1643221569478" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Gene-Feature" />
+    <SUITE FILE_PATH="coverage/PythonScripts$Gene_Feature_Format.coverage" NAME="Gene-Feature-Format Coverage Results" MODIFIED="1643223623198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Gene-Feature" />
     <SUITE FILE_PATH="coverage/PythonScripts$Gene_Feature_Graph.coverage" NAME="Gene_Feature_Graph Coverage Results" MODIFIED="1643220342112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Gene-Feature" />
   </component>
 </project>

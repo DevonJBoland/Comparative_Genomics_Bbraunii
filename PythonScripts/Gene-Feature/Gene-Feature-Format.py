@@ -92,6 +92,7 @@ def get_intron(gene_df):  # Not working properly to create a list of transcript 
     return transcript_with_introns
 
 
+"""When the feature_array is empty line 98 throws and error"""
 def annotate_intron(feature_array):
     intron_feature_array = pd.DataFrame(columns=col_names)
     seqname = feature_array.at[0, 'seqname']
@@ -102,7 +103,9 @@ def annotate_intron(feature_array):
     frame = '.'
     attribute = feature_array.at[0, 'attribute']
     limit = (len(feature_array) - 1)
-    if limit in [-1, 0]:
+    if feature_array.empty:
+        intron_feature_array = feature_array
+    elif limit == 0:
         intron_feature_array = feature_array
     else:
         for n in range(0, (limit-1), 1):
