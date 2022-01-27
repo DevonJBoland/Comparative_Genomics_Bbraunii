@@ -4,14 +4,14 @@ import pandas as pd
 import re
 import argparse as ap
 
-# parser = ap.ArgumentParser(description="Script to filter GTF files off incomplete gene annotations, "
-#                                        "and annotate intronic regions")
-# parser.add_argument("input", type=str, help="gtf file to extract feature from")
-# parser.add_argument("filtered_out", type=str, help="Path to write filtered complete models to")
-# parser.add_argument("incomplete_out", type=str, help="Path to write filtered incomplete models to")
-# parser.add_argument("intron_annotated_out", type=str, help="Path to write filtered intron annotated "
-#                                                               "complete models to")
-# args = parser.parse_args()
+parser = ap.ArgumentParser(description="Script to filter GTF files off incomplete gene annotations, "
+                                       "and annotate intronic regions")
+parser.add_argument("input", type=str, help="gtf file to extract feature from")
+parser.add_argument("filtered_out", type=str, help="Path to write filtered complete models to")
+parser.add_argument("incomplete_out", type=str, help="Path to write filtered incomplete models to")
+parser.add_argument("intron_annotated_out", type=str, help="Path to write filtered intron annotated "
+                                                              "complete models to")
+args = parser.parse_args()
 
 col_names = ['seqname', 'source', 'feature', 'start', 'end', 'score', 'strand', 'frame', 'attribute']
 
@@ -22,13 +22,18 @@ def filter_genes(x):
     incomplete_genes_df = pd.DataFrame(columns=col_names)
     complete_genes_df = pd.DataFrame(columns=col_names)
     transcript_ID = [data.at[i, 'attribute'] for i in data.index if data.at[i, 'feature'] == 'transcript']
-
+    start = 0
     for transcript in transcript_ID:
         temp_df = pd.DataFrame(columns=col_names)
-        for y in range(0, len(data.index)):
-            if re.search(transcript, data.at[y, 'attribute']):
+        for y in range(start, len(data.index)):
+            if data.at[y, 'feature'] == 'gene':
+                continue
+            elif re.search(transcript, data.at[y, 'attribute']):
                 entry = data.loc[y]
                 temp_df = temp_df.append(entry, ignore_index=True)
+            else:
+                start = y
+                break
 
         feature_checklist = [temp_df.at[i, 'feature'] for i in temp_df.index]
         if meetsgenecriteria(feature_checklist):
@@ -36,16 +41,8 @@ def filter_genes(x):
         else:
             incomplete_genes_df = incomplete_genes_df.append(temp_df, ignore_index=True)
 
-        to_remove = temp_df.at[1, 'attribute']
-        data = data[data.attribute != to_remove]
-        if data.at[0, 'feature'] == 'gene':
-            data = data.iloc[2:, :]
-        else:
-            data = data.iloc[1:, :]
-        data = data.reset_index(drop=True)
-
-    # complete_genes_df.to_csv(args.filtered_out, sep="\t", header=True, index=False)
-    # incomplete_genes_df.to_csv(args.incomplete_out, sep="\t", header=True, index=False)
+    complete_genes_df.to_csv(args.filtered_out, sep="\t", header=True, index=False)
+    incomplete_genes_df.to_csv(args.incomplete_out, sep="\t", header=True, index=False)
 
     return complete_genes_df
 
@@ -54,20 +51,22 @@ def get_intron(gene_df):  # Not working properly to create a list of transcript 
     transcript_ID = [gene_df.at[n, 'attribute'] for n in gene_df.index if gene_df.at[n, 'feature'] == 'transcript']
     transcript_with_introns_temp = pd.DataFrame(columns=col_names)
     transcript_with_introns = pd.DataFrame(columns=col_names)
+    start = 0
     for transcript in transcript_ID:
         temp_gene_df = pd.DataFrame(columns=col_names)
-        for y in range(0, len(gene_df.index)):
+        for y in range(start, len(gene_df.index)):
             if re.search(transcript, gene_df.at[y, 'attribute']):
                 entry = gene_df.loc[y]
                 temp_gene_df = temp_gene_df.append(entry, ignore_index=True)
+            else:
+                start = y
+                break
         if isnegeativegene(temp_gene_df):
             temp_df = reversechunck(temp_gene_df)
         else:
             temp_df = temp_gene_df
 
         # Assign individual arrays for each feature, reset index for concat later
-        """This needs to be fixed to handle cases where a UTR may not be present,
-        as of now it causes an error when this occurs"""
         transcript_array = temp_df[temp_df.feature == 'transcript']
         transcript_array.reset_index(inplace=True, drop=True)
         fiveprime_array = temp_df[temp_df.feature == '5\'-UTR']
@@ -92,22 +91,22 @@ def get_intron(gene_df):  # Not working properly to create a list of transcript 
     return transcript_with_introns
 
 
-"""When the feature_array is empty line 98 throws and error"""
+
 def annotate_intron(feature_array):
     intron_feature_array = pd.DataFrame(columns=col_names)
-    seqname = feature_array.at[0, 'seqname']
-    source = 'Custom_Intron_Script'
-    feature = 'intron'
-    score = '.'
-    strand = feature_array.at[0, 'strand']
-    frame = '.'
-    attribute = feature_array.at[0, 'attribute']
     limit = (len(feature_array) - 1)
-    if feature_array.empty:
+    if feature_array.empty or limit == 0:
         intron_feature_array = feature_array
-    elif limit == 0:
-        intron_feature_array = feature_array
+    # elif limit == 0:
+    #     intron_feature_array = feature_array
     else:
+        seqname = feature_array.at[0, 'seqname']
+        source = 'Custom_Intron_Script'
+        feature = 'intron'
+        score = '.'
+        strand = feature_array.at[0, 'strand']
+        frame = '.'
+        attribute = feature_array.at[0, 'attribute']
         for n in range(0, (limit-1), 1):
             feature_entry = feature_array.loc[n]
             intron_start = int(feature_array.at[n, 'end'] + 1)
@@ -142,17 +141,19 @@ def meetsgenecriteria(featurelist):
            featurelist.count('stop_codon') == 1
     # The requirement for feature check of UTR was removed as mRNA can be leaderless in all domains of life.
 
-with open('UTR-GTFs/test.gtf', "r") as file:
+
+with open(args.input, "r") as file:
     completegenes = filter_genes(file)
     # Test if the filtering step was a success
     if completegenes.empty:
         print("Genes Filtered = Failure!")
     else:
-        print("Genes Filtered = Success!" + "\n" + f"Output is saved to...")  # Need to insert a string for saved file
+        print("Genes Filtered = Success!" + "\n" + f"Filtered models output is saved to "
+              + str(args.filtered_out) + '\n' + 'Incomplete models output is saved to '
+              + str(args.incomplete_out))  # Need to insert a string for saved file
 
     annotated_genes = get_intron(completegenes)
     if annotated_genes.empty:
         print("Introns Annotated = Failure!")
     else:
-        print("Introns Annotated = Success!" + "\n" + f"Output is saved to...")
-
+        print("Introns Annotated = Success!" + "\n" + f"Output is saved to " + str(args.intron_annotated_out))
